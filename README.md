@@ -1,6 +1,10 @@
 # NFCE-Sefaz-PE
 Realiza download das informações da Nota Fiscal Eletronica (NFCe) no site da Secretária da Fazenda (SEFAZ) de Pernambuco http://nfce.sefaz.pe.gov.br/nfce-web/consultarNFCe
 
+# Install
+1. Clone o repositório `git clone https://github.com/barbixxxa/NFCE-Sefaz-PE.git`
+2. Instale as dependências em requirements.txt `pip install -r requirements.txt`
+
 # How To
 ## QRCode
 1. Leia o QRCode para obter a URL de acesso;
