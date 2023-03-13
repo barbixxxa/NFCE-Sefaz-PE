@@ -29,11 +29,15 @@ def main():
         'dhRecbto').text.split('T')[0])
 
     arquivo_nome = 'nfce-' + xNome + '-' + dhRecbto + '.xml'
+    arquivo_dir = '/home/theeam/Documents/NFCE-Sefaz-PE/output/'
 
-    print('=> Arquivo Salvo na pasta output: ' + arquivo_nome)
-
-    arquivo_output = open('output/'+arquivo_nome, 'w')
-    arquivo_output.write(arquivo_conteudo_xml_prettify)
+    try:
+        arquivo_output = open(arquivo_dir+arquivo_nome, 'w')
+        arquivo_output.write(arquivo_conteudo_xml_prettify)
+        print('=> NFCE salva com sucesso!\n==> ARQUIVO: \'' +
+              arquivo_nome + '\'\n==> PASTA: \'' + arquivo_dir + '\'')
+    except:
+        print('Erro ao salvar o arquivo!')
 
 
 if __name__ == "__main__":

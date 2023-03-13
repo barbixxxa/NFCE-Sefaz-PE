@@ -20,7 +20,7 @@ Caso não seja possível ler o QRCode, obtenha a URL via a chave de acesso segui
 
 # TODO
 ## Downloader.py
-- [ ] Integrar com leitura de QRCode
+- [ ] Integrar com leitura de QRCode (pyzbar,pyqrcode)
 - [ ] Receber lista de URL como entrada
 
 ## Dados
