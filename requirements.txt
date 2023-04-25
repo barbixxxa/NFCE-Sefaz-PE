@@ -1,4 +1,2 @@
-lxml
-beautifulsoup4
-argparse
-requests
+beautifulsoup4==4.12.2
+Requests==2.28.2
