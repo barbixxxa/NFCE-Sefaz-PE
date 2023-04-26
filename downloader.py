@@ -1,5 +1,6 @@
 import requests
 import argparse
+import lxml
 from bs4 import BeautifulSoup
 
 requests.packages.urllib3.disable_warnings()
@@ -29,7 +30,7 @@ def main():
         'dhRecbto').text.split('T')[0])
 
     arquivo_nome = 'nfce-' + xNome + '-' + dhRecbto + '.xml'
-    arquivo_dir = '/home/theeam/Documents/NFCE-Sefaz-PE/output/'
+    arquivo_dir = '/home/theeam/Documents/NFCE-Sefaz-PE-virtualEnv/NFCE-Sefaz-PE/output/'
 
     try:
         arquivo_output = open(arquivo_dir+arquivo_nome, 'w')
