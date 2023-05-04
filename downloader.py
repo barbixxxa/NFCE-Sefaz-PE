@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 
 def limparString(string):
-    return string.replace(" ", "_").replace(".", "_").lower()
+    return string.replace(" ", "_").replace(".", "_").replace("/", "_").replace("\\", "_").lower()
 
 
 def main():
@@ -37,8 +37,9 @@ def main():
         arquivo_output.write(arquivo_conteudo_xml_prettify)
         print('=> NFCE salva com sucesso!\n==> ARQUIVO: \'' +
               arquivo_nome + '\'\n==> PASTA: \'' + arquivo_dir + '\'')
-    except:
-        print('Erro ao salvar o arquivo!')
+    except Exception as e:
+        print('[ERROR] Arquivo NÃO foi salvo!')
+        print(e)
 
 
 if __name__ == "__main__":
