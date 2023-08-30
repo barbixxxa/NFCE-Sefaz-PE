@@ -1,6 +1,8 @@
+#!/usr/bin/python3
+
 import requests
 import argparse
-import lxml
+import os
 from bs4 import BeautifulSoup
 
 requests.packages.urllib3.disable_warnings()
@@ -28,12 +30,19 @@ def main():
 
     dhRecbto = limparString(arquivo_conteudo_xml.find(
         'dhRecbto').text.split('T')[0])
+    
+    nProt = limparString(arquivo_conteudo_xml.find('nProt').text)
 
-    arquivo_nome = 'nfce-' + xNome + '-' + dhRecbto + '.xml'
-    arquivo_dir = '/home/theeam/Documents/NFCE-Sefaz-PE-virtualEnv/NFCE-Sefaz-PE/output/'
+    arquivo_nome = 'nfce-' + xNome + '-' + dhRecbto + '-' + nProt +'.xml'
+    arquivo_dir = 'output'
+    arquivo_output_path = arquivo_dir + '/' + arquivo_nome
+
+    if not os.path.exists(arquivo_dir):
+        os.mkdir(arquivo_dir)
+        print('=> Pasta NÃO encontrada!\n==> Criando o diretório: ' + arquivo_dir + '\n')
 
     try:
-        arquivo_output = open(arquivo_dir+arquivo_nome, 'w')
+        arquivo_output = open(arquivo_output_path, 'w')
         arquivo_output.write(arquivo_conteudo_xml_prettify)
         print('=> NFCE salva com sucesso!\n==> ARQUIVO: \'' +
               arquivo_nome + '\'\n==> PASTA: \'' + arquivo_dir + '\'')
