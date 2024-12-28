@@ -14,7 +14,7 @@ requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
 parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--url", help="URL para realizar o download EX: 'http://nfce.sefaz.pe.gov.br/nfce-web/consultarNFCe?p=00000000000000000000000000000000000000000000|0|0|0|000000000000000000000'")
 parser.add_argument("-f", "--file", help="Arquivo txt contendo URLs para realizar o download")
-parser.add_argument("--xml", help="Arquivo XML para converter em CSV")
+parser.add_argument("--xml", help="Arquivo ou diretório contendo arquivos XML para converter em CSV")
 parser.add_argument("--csv", help="Arquivo de saída CSV")
 args = parser.parse_args()
 
@@ -67,42 +67,44 @@ def processar_url(url, erros):
         print(e)
         erros.append(url)
 
-def xml_to_csv(xml_file, csv_file):
+def xml_to_csv(xml_paths, csv_file):
     try:
-        tree = ET.parse(xml_file)
-        root = tree.getroot()
-        infNFe = root.find(f'{NAMESPACE}infNFe')
-
-        if infNFe is None:
-            raise ValueError("Tag infNFe não encontrada no arquivo XML.")
-
         with open(csv_file, mode='w', newline='') as file:
             writer = csv.writer(file)
             header = ["dhEmi", "cProd", "xProd", "qCom", "vUnCom", "vProd", "uTrib"]
             writer.writerow(header)
 
-            dhEmi_elem = infNFe.find(f'{NAMESPACE}dhEmi')
-            dhEmi = formatar_data(remover_espacos(dhEmi_elem.text)) if dhEmi_elem is not None else ''
-            for det in infNFe.findall(f'{NAMESPACE}det'):
-                prod = det.find(f'{NAMESPACE}prod')
-                if prod is not None:
-                    cProd_elem = prod.find(f'{NAMESPACE}cProd')
-                    xProd_elem = prod.find(f'{NAMESPACE}xProd')
-                    qCom_elem = prod.find(f'{NAMESPACE}qCom')
-                    vUnCom_elem = prod.find(f'{NAMESPACE}vUnCom')
-                    vProd_elem = prod.find(f'{NAMESPACE}vProd')
-                    uTrib_elem = prod.find(f'{NAMESPACE}uTrib')
-                    cProd = remover_espacos(cProd_elem.text) if cProd_elem is not None else ''
-                    xProd = remover_espacos(xProd_elem.text) if xProd_elem is not None else ''
-                    qCom = remover_espacos(qCom_elem.text) if qCom_elem is not None else ''
-                    vUnCom = substituir_pontos_por_virgulas(remover_espacos(vUnCom_elem.text)) if vUnCom_elem is not None else ''
-                    vProd = substituir_pontos_por_virgulas(remover_espacos(vProd_elem.text)) if vProd_elem is not None else ''
-                    uTrib = remover_espacos(uTrib_elem.text) if uTrib_elem is not None else ''
-                    writer.writerow([dhEmi, cProd, xProd, qCom, vUnCom, vProd, uTrib])
+            for xml_path in xml_paths:
+                tree = ET.parse(xml_path)
+                root = tree.getroot()
+                infNFe = root.find(f'{NAMESPACE}infNFe')
 
-        print(f'=> Dados do XML salvos com sucesso no arquivo CSV: {csv_file}')
+                if infNFe is None:
+                    print(f"Tag infNFe não encontrada no arquivo XML: {xml_path}")
+                    continue
+
+                dhEmi_elem = infNFe.find(f'{NAMESPACE}dhEmi')
+                dhEmi = formatar_data(remover_espacos(dhEmi_elem.text)) if dhEmi_elem is not None else ''
+                for det in infNFe.findall(f'{NAMESPACE}det'):
+                    prod = det.find(f'{NAMESPACE}prod')
+                    if prod is not None:
+                        cProd_elem = prod.find(f'{NAMESPACE}cProd')
+                        xProd_elem = prod.find(f'{NAMESPACE}xProd')
+                        qCom_elem = prod.find(f'{NAMESPACE}qCom')
+                        vUnCom_elem = prod.find(f'{NAMESPACE}vUnCom')
+                        vProd_elem = prod.find(f'{NAMESPACE}vProd')
+                        uTrib_elem = prod.find(f'{NAMESPACE}uTrib')
+                        cProd = remover_espacos(cProd_elem.text) if cProd_elem is not None else ''
+                        xProd = remover_espacos(xProd_elem.text) if xProd_elem is not None else ''
+                        qCom = remover_espacos(qCom_elem.text) if qCom_elem is not None else ''
+                        vUnCom = substituir_pontos_por_virgulas(remover_espacos(vUnCom_elem.text)) if vUnCom_elem is not None else ''
+                        vProd = substituir_pontos_por_virgulas(remover_espacos(vProd_elem.text)) if vProd_elem is not None else ''
+                        uTrib = remover_espacos(uTrib_elem.text) if uTrib_elem is not None else ''
+                        writer.writerow([dhEmi, cProd, xProd, qCom, vUnCom, vProd, uTrib])
+
+        print(f'=> Dados dos arquivos XML salvos com sucesso no arquivo CSV: {csv_file}')
     except Exception as e:
-        print(f'[ERROR] Falha ao processar o arquivo XML {xml_file}')
+        print(f'[ERROR] Falha ao processar os arquivos XML')
         print(e)
 
 def main():
@@ -120,9 +122,13 @@ def main():
             print(e)
             erros.append(args.file)
     elif args.xml and args.csv:
-        xml_to_csv(args.xml, args.csv)
+        if os.path.isdir(args.xml):
+            xml_files = [os.path.join(args.xml, f) for f in os.listdir(args.xml) if f.endswith('.xml')]
+        else:
+            xml_files = [args.xml]
+        xml_to_csv(xml_files, args.csv)
     else:
-        print("Por favor, forneça uma URL, um arquivo txt com URLs, ou um arquivo XML e um arquivo CSV para saída.")
+        print("Por favor, forneça uma URL, um arquivo txt com URLs, ou uma lista de arquivos XML e um arquivo CSV para saída.")
 
     if erros:
         with open('erros.txt', 'w') as erro_file:
